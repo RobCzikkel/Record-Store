@@ -1,0 +1,383 @@
+swagger: "2.0"
+
+
+info:
+  description: "Record store"
+  version: "1.0.0"
+  title: "Record Store REST API"
+
+schemes: 
+  - http
+
+host: localhost:5000
+
+basePath: "/"
+
+paths:
+  /:
+    get:
+      summary: "Loads home page"
+      description: "Home page"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: 200 Success
+          schema:
+            $ref: '#/definitions/GeneralResponse'
+        404:
+          description: 404 Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+
+  /signup:
+    post:
+      summary: "User signup endpoint"
+      description: "Adds user to the database"
+      produces: 
+        - "text/html"
+      parameters:
+        - name: username
+          description: Chosen name
+          in: body
+          type: string
+          required: true
+        - name: password
+          description: Chosen password
+          in: body
+          type: string
+          required: true
+        - name: email
+          description: Email of user
+          in: body
+          type: string
+          required: true
+      responses:
+        201:
+          description: 201 User created
+          headers: 
+            Set-Cookie:
+              schema: 
+                type: string
+                example: jwt=abcde12345; Path=/; HttpOnly
+          schema:
+            type: string
+        500:
+          description: 500 missing parameter
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  
+  /login:
+    post:
+      summary: "User login endpoint"
+      description: "Finds user in database, recreates JWT token if successful"
+      produces: 
+         - "text/html"
+      parameters:
+        - name: username
+          description: Registered name of user
+          in: body
+          type: string
+          required: true
+        - name: password
+          description: Registered password of user
+          in: body
+          type: string
+          required: true
+      responses:
+        200:
+          description: 200 User found
+          headers: 
+            Set-Cookie:
+              schema: 
+                type: string
+                example: jwt=abcde12345; Path=/; HttpOnly
+          schema:
+            type: string
+        500:
+          description: 500 missing parameter
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+
+  /logout:
+    get:
+      summary: "User logout endpoint"
+      description: "Logs user out by clearing destroying cookie"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: 200 User logged out
+          schema:
+            type: object
+        400:
+          description: Failed
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /authcheck:
+    post:
+      summary: "Authentication endpoint for frontend"
+      description: "Extracts jwt from cookie and returns user"
+      produces: 
+         - application/json
+      parameters:
+        - name: jwt
+          description: JWT token
+          in: cookie
+          type: string
+          required: true
+      responses:
+        200:
+          description: 200 User found
+          schema:
+            type: object
+        401:
+          description: 401 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /cart:
+    get:
+      summary: "Cart endpoint"
+      description: "Loads user cart"
+      produces:
+        - application/json
+      parameters:
+        - name: user_id
+          description: User ID
+          in: body
+          type: integer
+          require: true
+      responses:
+        200:
+          description: 200 Cart loaded
+          schema:
+            type: object
+        404:
+          description: 401 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    post:
+      summary: "Add to cart endpoint"
+      description: "Adds items to cart"
+      produces:
+        - application/json
+      parameters:
+        - name: cart_id
+          description: Cart ID of user
+          in: body
+          type: integer
+          required: true
+        - name: track_id
+          description: D of item being added
+          type: integer
+          in: body
+          required: true
+      response:
+        201:
+          description: 200 Item added
+          schema:
+            type: object
+        501:
+          description: Item not addedd
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      summary: "Delete item endpoint"
+      description: "Deletes items from cart"
+      produces:
+        - text/html
+      parameters:
+        - name: id
+          description: ID of item
+          type: integer
+          required: true
+          in: path
+      response:
+        200:
+          description: 200 Item deleted
+          schema:
+            type: boolean
+        501:
+          description: Item not deleted
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /users:
+    get:
+      summary: "All users endpoint on admin page"
+      description: "Loads all users"
+      produces: 
+        - application/json
+      parameters:
+        - name: jwt
+          in: cookie
+          required: true
+          type: string
+          description: jwt token in cookie
+      responses:
+        200:
+          description: 200 Users loaded
+          schema: 
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+    post:
+      summary: "Add user endpoint on admin page"
+      description: "Adds new user"
+      produces: 
+        - application/json
+      parameters:
+        - name: username
+          description: Chosen name
+          in: body
+          type: string
+          required: true
+        - name: password
+          description: Chosen password
+          in: body
+          type: string
+          required: true
+        - name: email
+          description: Email of user
+          in: body
+          type: string
+          required: true
+      responses:
+        201:
+          description: 201 User created
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            type: string
+        500:
+          description: 500 missing parameter
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      
+      
+      
+
+  /users/{id}:
+    get:
+      summary: "Single user endpoint on admin page"
+      description: "Loads single user by ID"
+      produces: 
+        - application/json
+      parameters:
+        - name: id
+          description: ID of user
+          type: integer
+          required: true
+          in: path
+        - name: jwt
+          in: cookie
+          required: true
+          type: string
+          description: jwt token in cookie
+      responses:
+        200:
+          description: 200 User loaded
+          schema: 
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+    put:
+      summary: "Update user endpoint on admin page"
+      description: "Updates new user"
+      produces: 
+        - application/json
+      parameters:
+        - name: id
+          description: ID of user
+          type: integer
+          required: true
+          in: path
+        - name: password
+          description: Chosen password
+          in: body
+          type: string
+          required: false
+        - name: email
+          description: Email of user
+          in: body
+          type: string
+          required: false
+      responses:
+        201:
+          description: 201 User updated
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            type: string
+        500:
+          description: 500 Value must be unique
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      summary: "Delete user endpoint on admin page"
+      description: "Deletes single user by ID"
+      produces: 
+        - application/json
+      parameters:
+        - name: id
+          description: ID of user
+          type: integer
+          required: true
+          in: path
+      responses:
+        200:
+          description: 200 User deleted
+          schema: 
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+
+
+
+definitions:
+  GeneralResponse:
+    type: object
+    properties:
+      code: 
+        type: number
+        description: returns 200 if successful
+      description:
+        type: string
+        description: Additional message to response code
+      required:
+        - code
+
+  ErrorResponse:
+    type: object
+    properties:
+      code: 
+        type: number
+      message:
+        type: string
+    required:
+      - code
+      - message
+
+

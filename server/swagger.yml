@@ -172,7 +172,7 @@ paths:
           type: integer
           required: true
         - name: track_id
-          description: D of item being added
+          description: ID of item being added
           type: integer
           in: body
           required: true

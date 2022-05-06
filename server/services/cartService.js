@@ -4,6 +4,9 @@ const Cart = new CartModel();
 const CartItemModel = require('../db/cartitemModel');
 const CartItem = new CartItemModel();
 
+const Stripe = require('stripe');
+const stripe = Stripe('sk_test_51KwT3pFFey9GAD5q9BT2yiIiS2ASUFwT14YuQsQMaKD54R8upSI9T1cKvvitxjhXohj8ZmyMBy2Qc080zsplXAZ700u6XjpgTt');
+
 module.exports = {
 
     createCart: async(user_id) => {
@@ -44,5 +47,22 @@ module.exports = {
     clearCart: async(cart_id) => {
         const response = await CartItem.clearCart(cart_id);
         return response;
+    },
+
+    checkOut: async(data, user_id) => {
+        const { cart_id, id, first, last, email, address, saveCard } = data;
+        if(saveCard) {
+            const customer = await stripe.customers.create({
+                name: `${first} ${last}`,
+                email: email,
+                address: {
+                    line1: address.line1,
+                    line2: address.line2,
+                    city: address.city,
+                    postal_code: address.postal_code,
+                    country: address.country
+                },
+              });
+        }
     }
 }

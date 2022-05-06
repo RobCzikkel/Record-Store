@@ -26,6 +26,7 @@
     "nodemon": "^2.0.15",
     "pg": "^8.7.1",
     "pg-promise": "^10.11.1",
+    "stripe": "^8.222.0",
     "swagger-ui-express": "^4.3.0"
   }
 }

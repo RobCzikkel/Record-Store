@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 var cartRouter = require('./routes/cart');
 var releasesRouter = require('./routes/releases');
 var downloadRouter = require('./routes/download');
+var ordersRouter = require('./routes/orders');
 
 var app = express();
 
@@ -35,7 +36,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/cart', cartRouter);
 app.use('/releases', releasesRouter);
-app.use('/download', downloadRouter)
+app.use('/download', downloadRouter);
+app.use('/orders', ordersRouter)
 app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerDoc));
 
 // catch 404 and forward to error handler

@@ -17,8 +17,7 @@ cartRouter.get('/', async(req,res,next) => {
 cartRouter.post('/', async(req,res,next) => {
     try {
         const item = await CartService.addItem(req.body.cart_id, req.body.track_id);
-        res.status(200).json(item)
-
+        res.status(200).json(item);
     } catch (error) {
         next(error)
     }
@@ -33,6 +32,16 @@ cartRouter.delete('/:id', async(req,res,next) => {
         next(error);
     }
 });
+
+//CHECKOUT current cart
+cartRouter.post('/checkout', async(req,res,next) => {
+    try {
+        const response = await CartService.checkOut(req.body, req.user.id);
+        res.status(200).json(response)
+    } catch (error) {
+        next(error)
+    }
+})
 
 
 module.exports = cartRouter;

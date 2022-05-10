@@ -2,6 +2,8 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { AuthFromCookie } = require('../services/jwtService')
 
+require('dotenv').config();
+
 const indexRouter = express.Router();
 const UserService = require('../services/userService')
 const CartService = require('../services/cartService')

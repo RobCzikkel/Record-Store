@@ -36,7 +36,7 @@ cartRouter.delete('/:id', async(req,res,next) => {
 //CHECKOUT current cart
 cartRouter.post('/checkout', async(req,res,next) => {
     try {
-        const response = await CartService.checkOut(req.body, req.user.id);
+        const response = await CartService.checkOut(req.body, req.user);
         res.status(200).json(response)
     } catch (error) {
         next(error)

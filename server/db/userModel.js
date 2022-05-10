@@ -8,10 +8,10 @@ let saltRound = 10;
 
 module.exports = class User {
 
-    async addUser(username, password, email, ip) {
+    async addUser(username, password, email, ip, stripe_id) {
         try {
             const hashedPassword = await bcrypt.hash(password, saltRound)
-            const result = await pool.query('INSERT INTO users(username, password, email, ip) VALUES($1,$2,$3,$4) RETURNING id, username, email, ip, role', [username, hashedPassword, email, ip]);
+            const result = await pool.query('INSERT INTO users(username, password, email, ip, stripe_id) VALUES($1,$2,$3,$4,$5) RETURNING id, username, email, ip, role, stripe_id', [username, hashedPassword, email, ip, stripe_id]);
             return result.rows[0];
         } catch (error) {
             throw createError(401, error);

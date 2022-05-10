@@ -7,7 +7,7 @@ CREATE TABLE users (
     password TEXT,
     email TEXT UNIQUE,
     ip CIDR,
-    googleid TEXT UNIQUE,
+    stripe_id TEXT UNIQUE,
     role TEXT DEFAULT 'user',
     last_login TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     registered TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

@@ -17,8 +17,8 @@ module.exports = {
         return response;
     },
 
-    addUser: async({username, password, email, ip}) => {
-        const response = await User.addUser(username, password, email, ip);
+    addUser: async({username, password, email, ip, stripe_id}) => {
+        const response = await User.addUser(username, password, email, ip, stripe_id);
         return response;
     },
 

@@ -4,6 +4,12 @@ const Cart = new CartModel();
 const CartItemModel = require('../db/cartitemModel');
 const CartItem = new CartItemModel();
 
+const OrderModel = require('../db/orderModel')
+const Order = new OrderModel();
+
+const OrderItemModel = require('../db/orderItemModel');
+const OrderItem = new OrderItemModel()
+
 const Stripe = require('stripe');
 const stripe = Stripe('sk_test_51KwT3pFFey9GAD5q9BT2yiIiS2ASUFwT14YuQsQMaKD54R8upSI9T1cKvvitxjhXohj8ZmyMBy2Qc080zsplXAZ700u6XjpgTt');
 
@@ -49,20 +55,30 @@ module.exports = {
         return response;
     },
 
-    checkOut: async(data, user_id) => {
-        const { cart_id, id, first, last, email, address, saveCard } = data;
-        if(saveCard) {
-            const customer = await stripe.customers.create({
-                name: `${first} ${last}`,
-                email: email,
-                address: {
-                    line1: address.line1,
-                    line2: address.line2,
-                    city: address.city,
-                    postal_code: address.postal_code,
-                    country: address.country
-                },
-              });
-        }
+    checkOut: async(data, user) => {
+        const { first, last, email, address, saveCard } = data;
+
+        const tracks = await CartItem.getItems(user.cart_id);
+        const total = tracks.reduce((acc, cur) => {
+            return acc + Number(cur.price)
+        }, 0)
+
+        const order = await Order.createOrder({user_id: user.id, total: total});
+        order.tracks = await Promise.all(tracks.map(async(track) => await OrderItem.addItem({order_id: order.id, track_id: track.id, price: track.price})))
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            customer: user.stripe_id,
+            setup_future_usage: 'on_session',
+            amount: total,
+            currency: 'gbp',
+            automatic_payment_methods: {
+              enabled: true,
+            },
+          });
+
+        order.client_secret = paymentIntent.client_secret;
+        await CartItem.clearCart(user.cart_id);
+
+        return order
     }
 }

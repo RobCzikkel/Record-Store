@@ -2,7 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { AuthFromCookie } = require('../services/jwtService')
 
-require('dotenv').config();
+// require('dotenv').config();
 
 const indexRouter = express.Router();
 const UserService = require('../services/userService')
@@ -10,18 +10,22 @@ const CartService = require('../services/cartService')
 
 const emitter = require('../events');
 
+const Stripe = require('stripe');
+const stripe = Stripe('sk_test_51KwT3pFFey9GAD5q9BT2yiIiS2ASUFwT14YuQsQMaKD54R8upSI9T1cKvvitxjhXohj8ZmyMBy2Qc080zsplXAZ700u6XjpgTt');
 
 //HOME PAGE
-indexRouter.get('/', (req, res, next) => {
-  res.status(200).json("Honey, I\'m home!");
+indexRouter.get('/', async(req, res, next) => {
+  res.status(200).send('Honey, I\'m home')
 });
 
 
 //SIGNUP - CREATES USER + JWT + COOKIE
 indexRouter.post('/signup', async(req, res, next) => {
   try {
-    const ip = req.ip
-    const params = {...req.body, ip}
+    const customer = await stripe.customers.create();
+    const ip = req.ip;
+    const stripe_id = customer.id;
+    const params = {...req.body, ip, stripe_id}
 
     const user = await UserService.addUser(params);
     const cart = await CartService.createCart(user.id);

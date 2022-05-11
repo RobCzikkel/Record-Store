@@ -39,7 +39,6 @@ module.exports = {
                 return createError(404, 'User not found')
             };
             let match = await bcrypt.compare(password, user.password);
-            console.log(match)
             if(!match) {
                 return createError(404, 'Password incorrect')
             }

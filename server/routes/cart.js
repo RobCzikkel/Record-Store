@@ -1,6 +1,6 @@
 const express = require('express');
 const cartRouter = express.Router();
-
+const emitter = require('../events');
 const CartService = require('../services/cartService');
 
 //GET cart of user
@@ -37,7 +37,10 @@ cartRouter.delete('/:id', async(req,res,next) => {
 cartRouter.post('/checkout', async(req,res,next) => {
     try {
         const response = await CartService.checkOut(req.body, req.user);
-        res.status(200).json(response)
+        res.status(200).json(response);
+        
+        emitter.emit('purchase', req.user.email);
+
     } catch (error) {
         next(error)
     }

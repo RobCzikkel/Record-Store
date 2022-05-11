@@ -8,7 +8,10 @@ const OrderModel = require('../db/orderModel')
 const Order = new OrderModel();
 
 const OrderItemModel = require('../db/orderItemModel');
-const OrderItem = new OrderItemModel()
+const OrderItem = new OrderItemModel();
+
+const AddressModel = require('../db/addressModel');
+const Address = new AddressModel()
 
 const Stripe = require('stripe');
 const stripe = Stripe('sk_test_51KwT3pFFey9GAD5q9BT2yiIiS2ASUFwT14YuQsQMaKD54R8upSI9T1cKvvitxjhXohj8ZmyMBy2Qc080zsplXAZ700u6XjpgTt');
@@ -76,9 +79,20 @@ module.exports = {
             },
           });
 
+        const addressData = {
+            user_id: user.id,
+            first: first,
+            last: last,
+            city: address.city,
+            postcode: address.postcode,
+            country: address.country
+        };
+
+        order.customerAddress = await Address.createAddress(addressData);  
         order.client_secret = paymentIntent.client_secret;
+
         await CartItem.clearCart(user.cart_id);
 
-        return order
+        return order;
     }
 }

@@ -83,6 +83,7 @@ module.exports = {
             user_id: user.id,
             first: first,
             last: last,
+            street: address.street,
             city: address.city,
             postcode: address.postcode,
             country: address.country

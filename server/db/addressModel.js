@@ -15,7 +15,7 @@ module.exports = class Address {
 
     async getAddress(user_id) {
         try {
-            const result = await pool.query('SELECT first, last, city, postcode, country FROM customer_addresses WHERE user_id=$1', [user_id]);
+            const result = await pool.query('SELECT first, last, street, city, postcode, country FROM customer_addresses WHERE user_id=$1', [user_id]);
             return result.rows[0]
         } catch (error) {
             throw error;

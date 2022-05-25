@@ -18,6 +18,7 @@ CREATE TABLE customer_addresses (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     first TEXT,
     last TEXT,
+    street TEXT,
     city TEXT,
     postcode TEXT,
     country TEXT

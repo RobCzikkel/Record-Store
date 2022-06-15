@@ -354,6 +354,216 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse' 
 
+  /orders:
+    get:
+      summary: "Endpoint for user's orders"
+      description: "Returns all past orders of user"
+      produces:
+        - application/json
+      parameters:
+        - name: user.id
+          in: header
+          description: ID of user
+          type: integer
+          required: true
+      responses:
+        200:
+          description: 200 Orders loaded
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+  /orders/{id}:
+    get:
+      summary: "Endpoint for single order of a user"
+      description: "Returns a single order of a user"
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          description: ID of an order
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: 200 Order loaded
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 Order not found
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+
+  /address/{id}:
+    get:
+      summary: "Admin endpoint to retrieve an address of a user"
+      description: "Returns the address of a user"
+      produces:
+        - application/json
+      parameter:
+        - name: id
+          description: ID of a user
+          type: integer
+          in: path
+          required: true
+      responses:
+        200:
+          description: 200 Address loaded
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 Address not found
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+  /address:
+    post:
+      summary: "Endpoint to add an address for a user"
+      description: "Adds address to a user by ID"
+      produces:
+      - application/json
+      parameter:
+        - name: user_id
+          description: ID of the user
+          type: integer
+          required: true
+          in: body
+        - name: first
+          description: firstname of the user
+          type: string
+          required: false
+          in: body
+        - name: last
+          description: lastname of the user
+          type: string
+          in: body
+          required: false
+        - name: street
+          description: street of the user's address
+          type: string
+          in: body
+          required: true
+        - name: city
+          description: city of the user's address
+          type: string
+          in: body
+          required: false
+        - name: postcode
+          description: postcode of the user's address
+          type: string
+          in: body
+          required: true
+        - name: country
+          description: country of the user's address
+          type: string
+          in: body
+          required: true
+      responses:
+        201:
+          description: 201 Address added
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 Address not added
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+  /address/{id}:
+    put:
+      summary: "Endpoint to update an address for a user"
+      description: "Updates address to a user by ID"
+      produces:
+      - application/json
+      parameter:
+        - name: id
+          description: ID of the address
+          type: integer
+          required: true
+          in: path
+        - name: user_id
+          description: ID of the user
+          type: integer
+          required: true
+          in: body
+        - name: first
+          description: firstname of the user
+          type: string
+          required: false
+          in: body
+        - name: last
+          description: lastname of the user
+          type: string
+          in: body
+          required: false
+        - name: street
+          description: street of the user's address
+          type: string
+          in: body
+          required: true
+        - name: city
+          description: city of the user's address
+          type: string
+          in: body
+          required: false
+        - name: postcode
+          description: postcode of the user's address
+          type: string
+          in: body
+          required: true
+        - name: country
+          description: country of the user's address
+          type: string
+          in: body
+          required: true
+      responses:
+        201:
+          description: 201 Address updated
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 Address not updated
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+  /address/{id}:
+    delete:
+      summary: "Endpoint to delete an address for a user"
+      description: "Deletes address to a user by ID"
+      produces:
+      - application/json
+      responses:
+        200:
+          description: 200 Address deleted
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 Address not deleted
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
 
 
 definitions:

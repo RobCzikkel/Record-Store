@@ -2,10 +2,11 @@ const addressRouter = require('express').Router();
 const AddressService = require('../services/addressService');
 const { AuthFromCookie } = require('../services/jwtService');
 
+
 // Protecting the endpoint
 addressRouter.use(AuthFromCookie);
 
-// GET user's addredd
+// GET user's address
 addressRouter.get('/:id', async(req,res,next) => {
     try {
         const address = await AddressService.getAddress(req.params.id);

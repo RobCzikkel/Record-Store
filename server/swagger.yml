@@ -1,4 +1,4 @@
-swagger: "2.0"
+openapi: 3.0.0
 
 
 info:
@@ -72,22 +72,19 @@ paths:
     post:
       summary: "User login endpoint"
       description: "Finds user in database, recreates JWT token if successful"
-      produces: 
-         - "text/html"
-      parameters:
-        - name: username
-          description: Registered name of user
-          in: body
-          type: string
-          required: true
-        - name: password
-          description: Registered password of user
-          in: body
-          type: string
-          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string  
       responses:
         200:
-          description: 200 User found
+          description: 200 User found/ Login successful
           headers: 
             Set-Cookie:
               schema: 
@@ -430,62 +427,6 @@ paths:
           description: 500 Address not found
           schema:
             $ref: '#/definitions/ErrorResponse' 
-  /address:
-    post:
-      summary: "Endpoint to add an address for a user"
-      description: "Adds address to a user by ID"
-      produces:
-      - application/json
-      parameter:
-        - name: user_id
-          description: ID of the user
-          type: integer
-          required: true
-          in: body
-        - name: first
-          description: firstname of the user
-          type: string
-          required: false
-          in: body
-        - name: last
-          description: lastname of the user
-          type: string
-          in: body
-          required: false
-        - name: street
-          description: street of the user's address
-          type: string
-          in: body
-          required: true
-        - name: city
-          description: city of the user's address
-          type: string
-          in: body
-          required: false
-        - name: postcode
-          description: postcode of the user's address
-          type: string
-          in: body
-          required: true
-        - name: country
-          description: country of the user's address
-          type: string
-          in: body
-          required: true
-      responses:
-        201:
-          description: 201 Address added
-          schema:
-            type: object
-        404:
-          description: 404 User not authorized
-          schema:
-            $ref: '#/definitions/ErrorResponse' 
-        500:
-          description: 500 Address not added
-          schema:
-            $ref: '#/definitions/ErrorResponse' 
-  /address/{id}:
     put:
       summary: "Endpoint to update an address for a user"
       description: "Updates address to a user by ID"
@@ -544,8 +485,7 @@ paths:
         500:
           description: 500 Address not updated
           schema:
-            $ref: '#/definitions/ErrorResponse' 
-  /address/{id}:
+            $ref: '#/definitions/ErrorResponse'
     delete:
       summary: "Endpoint to delete an address for a user"
       description: "Deletes address to a user by ID"
@@ -564,6 +504,63 @@ paths:
           description: 500 Address not deleted
           schema:
             $ref: '#/definitions/ErrorResponse' 
+            
+  /address:
+    post:
+      summary: "Endpoint to add an address for a user"
+      description: "Adds address to a user by ID"
+      produces:
+      - application/json
+      parameter:
+        - name: user_id
+          description: ID of the user
+          type: integer
+          required: true
+          in: body
+        - name: first
+          description: firstname of the user
+          type: string
+          required: false
+          in: body
+        - name: last
+          description: lastname of the user
+          type: string
+          in: body
+          required: false
+        - name: street
+          description: street of the user's address
+          type: string
+          in: body
+          required: true
+        - name: city
+          description: city of the user's address
+          type: string
+          in: body
+          required: false
+        - name: postcode
+          description: postcode of the user's address
+          type: string
+          in: body
+          required: true
+        - name: country
+          description: country of the user's address
+          type: string
+          in: body
+          required: true
+      responses:
+        201:
+          description: 201 Address added
+          schema:
+            type: object
+        404:
+          description: 404 User not authorized
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+        500:
+          description: 500 Address not added
+          schema:
+            $ref: '#/definitions/ErrorResponse' 
+    
 
 
 definitions:

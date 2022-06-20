@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "test": "jest --detectOpenHandles"
   },
   "dependencies": {
     "adm-zip": "^0.5.9",
@@ -28,5 +29,10 @@
     "pg-promise": "^10.11.1",
     "stripe": "^8.222.0",
     "swagger-ui-express": "^4.3.0"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "jest": "^28.1.1",
+    "supertest": "^6.2.3"
   }
 }

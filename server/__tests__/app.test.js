@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
 
+
 describe('GET /', () => {
     test('responds with 200', done => {
       request(app)
@@ -11,13 +12,17 @@ describe('GET /', () => {
 
 
 describe('POST /login', () => {
-    test('responds with 200', done => {
+    test('responds with 200', (done) => {
         request(app)
         .post('/login')
         .send({username: 'test', password:'test'})
         .set('Accept', 'application/json')
         .expect('Content-Type', "text/html; charset=utf-8")
-        .expect(200, done)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          return done();
+        });
     });
 });
 

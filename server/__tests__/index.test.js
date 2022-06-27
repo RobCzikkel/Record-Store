@@ -1,6 +1,11 @@
 const request = require('supertest');
 const app = require('../app');
+const { pool } = require('../db/config');
 
+//Closing DB connection after test for graceful exit
+afterAll(async() => {
+  await pool.end()
+});
 
 describe('GET /', () => {
     test('responds with 200', done => {
@@ -11,19 +16,17 @@ describe('GET /', () => {
 });
 
 
+
 describe('POST /login', () => {
-    test('responds with 200', (done) => {
-        request(app)
+  test('responds with 200 and returns a cookie called jwt', async () => {
+      const response = await request(app)
         .post('/login')
         .send({username: 'test', password:'test'})
         .set('Accept', 'application/json')
-        .expect('Content-Type', "text/html; charset=utf-8")
-        .expect(200)
-        .end(function(err, res) {
-          if (err) return done(err);
-          return done();
-        });
-    });
+
+      expect(response.status).toEqual(200);
+      expect(response.headers['set-cookie'][0]).toContain('jwt')
+  });
 });
 
 describe('GET /authcheck', () => {

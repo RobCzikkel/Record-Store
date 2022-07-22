@@ -13,10 +13,15 @@ module.exports = class CartItem {
         }
     }
 
-    async deleteItem(track_id) {
+    async deleteItem(id) {
         try {
-            const result = pool.query('DELETE FROM cart_item WHERE track_id=$1', [track_id]);
-            return true;
+            const result = await pool.query('DELETE FROM cart_item WHERE id=$1', [id]);
+            if (result.rowCount === 0) {
+                return false;
+            } else {
+                return true
+            }
+            
         } catch (error) {
             throw error;
         }
@@ -24,7 +29,7 @@ module.exports = class CartItem {
 
     async clearCart(cart_id) {
         try {
-            const result = pool.query('DELETE FROM cart_item WHERE cart_id=$1', [cart_id]);
+            const result = await pool.query('DELETE FROM cart_item WHERE cart_id=$1', [cart_id]);
             return true;
         } catch (error) {
             throw error;
@@ -33,10 +38,10 @@ module.exports = class CartItem {
 
     async getItems(cart_id) {
         try {
-            const result = pool.query(`SELECT c.id, c.cart_id, c.track_id, t.title AS track_title, t.playtime, t.price, a.title AS album_title, a.release_date, a.press, a.cover
+            const result = await pool.query(`SELECT c.id, c.cart_id, c.track_id, t.title AS track_title, t.playtime, t.price, a.title AS album_title, a.release_date, a.press, a.cover
                                        FROM cart_item c
                                        INNER JOIN tracks t ON c.track_id=t.id
-                                       INNER JOIN albums a on t.album_id=albums.id
+                                       INNER JOIN albums a on t.album_id=a.id
                                        WHERE cart_id=$1`, [cart_id]);
             return result.rows;
         } catch (error) {

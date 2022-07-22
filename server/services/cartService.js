@@ -22,34 +22,34 @@ module.exports = {
         params = {
             user_id: user_id
         }
-        const cart = Cart.createCart(params);
+        const cart = await Cart.createCart(params);
         return cart;
     },
 
     getCartByID: async(id) => {
-        const cart = Cart.getCartByID(id);
+        const cart = await Cart.getCartByID(id);
         return cart;
     },
 
     getCartByUserID: async(user_id) => {
-        const cart = Cart.getCartByUserID(user_id);
+        const cart = await Cart.getCartByUserID(user_id);
         return cart;
     },
 
     loadCart: async(user_id) => {
-        const cart = Cart.getCartByUserID(user_id);
-        const items = CartItem.getItems(cart.id);
+        const cart = await Cart.getCartByUserID(user_id);
+        const items = await CartItem.getItems(cart.id);
         cart.items = items;
         return cart;
     },
 
     addItem: async(cart_id, track_id) => {
-        const item = await CartItem.addItem(cart_id,track_id);
+        const item = await CartItem.addItem({cart_id:cart_id,track_id});
         return item; 
     },
 
-    deleteItem: async(track_id) => {
-        const response = await CartItem.deleteItem(track_id);
+    deleteItem: async(id) => {
+        const response = await CartItem.deleteItem(id);
         return response;
     },
 
@@ -59,24 +59,26 @@ module.exports = {
     },
 
     checkOut: async(data, user) => {
-        const { first, last, email, address, saveCard } = data;
+        // const { first, last, address, saveCard } = data;
+        const { first, last, address, currency, saveCard } = data;
 
         const tracks = await CartItem.getItems(user.cart_id);
         const total = tracks.reduce((acc, cur) => {
             return acc + Number(cur.price)
         }, 0)
-
+        console.log(tracks)
         const order = await Order.createOrder({user_id: user.id, total: total});
-        order.tracks = await Promise.all(tracks.map(async(track) => await OrderItem.addItem({order_id: order.id, track_id: track.id, price: track.price})))
+        order.tracks = await Promise.all(tracks.map(async(track) => await OrderItem.addItem({order_id: order.id, track_id: track.track_id, price: track.price})))
 
         const paymentIntent = await stripe.paymentIntents.create({
             customer: user.stripe_id,
             setup_future_usage: 'on_session',
-            amount: total,
+            amount: total * 100,
             currency: 'gbp',
-            automatic_payment_methods: {
-              enabled: true,
-            },
+            payment_method_types: ['card'],
+            // automatic_payment_methods: {
+            //   enabled: true,
+            // },
           });
 
         const addressData = {

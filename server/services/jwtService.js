@@ -38,11 +38,21 @@ const AuthFromHeaders = async(req, res, next) => {
             next(error)
         }
     } else {
-        res.status(500).json({'error': 'Not authorized'});
+        res.status(401).json({'error': 'Not authorized'});
+    }
+}
+
+const AdminAuth = async(req,res,next) => {
+    const role = req.user.role
+    if (role === 'admin') {
+        next()
+    } else {
+        res.status(401).json({"Error": "User must be authorized as an Administrator to access this endpoint"})
     }
 }
 
 module.exports = {
     AuthFromCookie,
-    AuthFromHeaders
+    AuthFromHeaders,
+    AdminAuth
 }

@@ -1,6 +1,6 @@
 const addressRouter = require('express').Router();
 const AddressService = require('../services/addressService');
-const { AuthFromCookie } = require('../services/jwtService');
+const { AuthFromCookie, AdminAuth } = require('../services/jwtService');
 
 
 // Protecting the endpoint

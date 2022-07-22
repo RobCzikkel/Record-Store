@@ -20,7 +20,7 @@ module.exports = class User {
 
     async getUserByName(username) {
         try {
-            const result = await pool.query('SELECT id, username, password, email, ip, role FROM users WHERE username=$1', [username]);
+            const result = await pool.query('SELECT id, username, password, email, ip, role, stripe_id FROM users WHERE username=$1', [username]);
             return result.rows[0];
         } catch (error) {
             throw error;

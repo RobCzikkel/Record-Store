@@ -1,5 +1,5 @@
 const releasesRouter = require('express').Router();
-const { AuthFromCookie } = require('../services/jwtService');
+const { AuthFromCookie, AdminAuth } = require('../services/jwtService');
 const ReleaseService = require('../services/releaseService');
 const S3ervice = require('../services/s3Service');
 
@@ -33,7 +33,7 @@ releasesRouter.get('/:id', async(req,res,next) => {
 });
 
 //POST AN ALBUM
-releasesRouter.post('/create-release', async(req,res,next) => {
+releasesRouter.post('/create-release', AuthFromCookie, AdminAuth, async(req,res,next) => {
     let params = req.body;
     try {
         if (!req.files) {               //if no cover was uploaded
@@ -43,14 +43,14 @@ releasesRouter.post('/create-release', async(req,res,next) => {
         const s3response = await S3ervice.uploadImage(req.files.cover);   //if cover was uploaded
         params = {...params, cover: req.files.cover.name};
         const response = await ReleaseService.createAlbum(params);
-        res.status(201).json({response});
+        res.status(201).json(response);
     } catch (error) {
         next(error);
     }
 });
 
 //UPDATE/UPLOAD AN IMAGE FOR AN ALBUM 
-releasesRouter.post('/:id/upload-image', async(req,res,next) => {
+releasesRouter.post('/:id/upload-image', AuthFromCookie, AdminAuth, async(req,res,next) => {
     try {
         if (!req.files) {
             res.status(404).json({"Error": "No file selected"});
@@ -58,7 +58,7 @@ releasesRouter.post('/:id/upload-image', async(req,res,next) => {
         const album = await ReleaseService.getSingleAlbum(req.params.id)
         const deleteResponse = await S3ervice.deleteImage(album.cover);  //this will delete the previous image first
         const s3response = await S3ervice.uploadImage(req.files.cover);  //this uploads the new image
-        const response = await ReleaseService.updateAlbum({id: req.params.id, cover: req.files.cover.name});  //updates the cover in db
+        const response = await ReleaseService.updateAlbum(req.params.id, {cover: req.files.cover.name});  //updates the cover in db
         res.status(201).json(response);
     } catch (error) {
         next(error);
@@ -66,16 +66,17 @@ releasesRouter.post('/:id/upload-image', async(req,res,next) => {
 })
 
 //UPDATE AN ALBUM
-releasesRouter.put('/:id', async(req,res,next) => {
+releasesRouter.put('/:id', AuthFromCookie, AdminAuth, async(req,res,next) => {
     try {
-        const response = await ReleaseService.updateAlbum(req.body);
+        const response = await ReleaseService.updateAlbum(req.params.id, req.body);
         res.status(201).json(response);
     } catch (error) {
         next(error);
     }
 });
+
 //DELETE AN ALBUM
-releasesRouter.delete('/:id', async(req,res,next) => {
+releasesRouter.delete('/:id', AuthFromCookie, AdminAuth, async(req,res,next) => {
     try {
         const album = await ReleaseService.getSingleAlbum(req.params.id);
         await S3ervice.deleteImage(album.cover);
@@ -94,7 +95,7 @@ releasesRouter.delete('/:id', async(req,res,next) => {
 TRACKS ENDPOINTS
 ****************************************************************************************************************/
 //ADD TRACK + SAMPLE VIA RELEASE
-releasesRouter.post('/:id/upload-track', async(req,res,next) => {
+releasesRouter.post('/:id/upload-track', AuthFromCookie, AdminAuth, async(req,res,next) => {
     let params = req.body
     let sampleResponse = null;
     let trackResponse = null;
@@ -112,8 +113,9 @@ releasesRouter.post('/:id/upload-track', async(req,res,next) => {
         next(error)
     }
 });
+
 //UPDATE TRACKS DB & S3 - USE IT WITH REACT-EDIT-TEXT
-releasesRouter.put('/:id/update-track', async(req,res,next) => {
+releasesRouter.put('/tracks/:id/update-track', AuthFromCookie, AdminAuth, async(req,res,next) => {
     const track = await ReleaseService.getSingleTrack(req.params.id);
     let params = req.body;
     let trackDelResponse;
@@ -138,7 +140,7 @@ releasesRouter.put('/:id/update-track', async(req,res,next) => {
     }
 });
 //DELETE TRACK
-releasesRouter.delete('/tracks/:id', async(req,res,next) => {
+releasesRouter.delete('/tracks/:id/delete', AuthFromCookie, AdminAuth, async(req,res,next) => {
     try {
         const track = await ReleaseService.getSingleTrack(req.params.id);
         const trackDelResponse = await S3ervice.deleteTrack(track.title);

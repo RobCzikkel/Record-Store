@@ -3,10 +3,14 @@ const usersRouter = express.Router();
 const { AuthFromCookie } = require('../services/jwtService');
 const UserService = require('../services/userService');
 const CartService = require('../services/cartService');
-
+require('dotenv').config();
 
 
 usersRouter.use(AuthFromCookie)  // middleware to extract user from jwt token in cookie
+
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_KEY);
+
 
 //GET all users 
 usersRouter.get('/', async(req, res, next) => {     
@@ -44,8 +48,13 @@ usersRouter.get('/:id', async(req,res,next) => {
 usersRouter.post('/', async( req,res,next) => {
   try {
     if (req.user.role === 'admin') {
-      const user = await UserService.addUser(req.body);
+      const customer = await stripe.customers.create();
+      const ip = req.ip;
+      const stripe_id = customer.id;
+      const params = {...req.body, ip, stripe_id}
+      const user = await UserService.addUser(params);
       const cart = await CartService.createCart(user.id);
+      user.cart_id = cart.id;
       res.status(201).json(user);
     } else {
       res.status(404).send('User not authorized');

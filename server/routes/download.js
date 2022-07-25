@@ -3,10 +3,11 @@ const { S3 } = require('aws-sdk');
 const ReleaseService = require('../services/releaseService');
 const s3Service = require('../services/s3Service');
 const S3ervice = require('../services/s3Service');
-
+const { AuthFromCookie } = require('../services/jwtService');
 var AdmZip = require("adm-zip");
 
 require('dotenv').config();
+downloadRouter.use(AuthFromCookie)  // protecting the endpoint
 
 // Single track download
 //Frontend for downloading: https://stackoverflow.com/questions/22143628/nodejs-how-do-i-download-a-file-to-disk-from-an-aws-s3-bucket
@@ -25,16 +26,15 @@ downloadRouter.get('/:id', async(req,res,next) => {
 // Front end for downloading zip: https://stackoverflow.com/questions/33260789/create-and-send-zip-file-node-js
 
 /* SOLUTION 1 - Buffer */
-downloadRouter.get('/all/tracks', async(req,res,next) => {
+downloadRouter.post('/all/tracks', async(req,res,next) => {
     const zip = new AdmZip();
     try {
-        await Promise.all(req.query.track.map(async(track) => {
+        await Promise.all(req.body.tracks.map(async(track) => {
             const dlResponse =  await S3ervice.downloadTrack(track);
             zip.addFile(track, Buffer.from(dlResponse.Body));
         }))  
         const data = zip.toBuffer()
         res.status(200).send(data)
-
     } catch (error) {
         next();
     }

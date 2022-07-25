@@ -165,11 +165,11 @@ module.exports = {
         };
     },
 
-    downloadTrack: async(track) => {
+    downloadTrack: async(title) => {
         const s3 = new AWS.S3();
         const params = {
             Bucket: 'record-store-czr/tracks',
-            Key: track
+            Key: title
         };
         try {
             const data = await s3.getObject(params).promise();
